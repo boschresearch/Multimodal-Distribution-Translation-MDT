@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
+# All rights reserved.
+
 import torch
 from matplotlib import pyplot as plt
 from utils.metrics.shapenet import iou_3d, f_score, compute_1_nna

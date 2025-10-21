@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
+# All rights reserved.
+
 """
 - For more info about the training setup got to the file names.py to MMLossTypes object
 - For more info about architectures ...
