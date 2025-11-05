@@ -1,4 +1,4 @@
-
+// Stripped from https://github.com/cvlab-epfl/UCLID-Net/blob/main/extensions/chamfer.cu
 #include <stdio.h>
 #include <ATen/ATen.h>
 

@@ -1,7 +1,7 @@
-# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
-# All rights reserved.
+"""Various utilities for neural networks.
 
-"""Various utilities for neural networks."""
+Stripped from https://github.com/aengusng8/Consistency-GAN/blob/main/cm/nn.py
+"""
 
 import math
 

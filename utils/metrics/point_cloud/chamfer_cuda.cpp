@@ -1,6 +1,7 @@
 #include <torch/torch.h>
 #include <vector>
 
+// Stripped from https://github.com/cvlab-epfl/UCLID-Net/blob/main/extensions/chamfer_cuda.cpp
 ///TMP
 //#include "common.h"
 /// NOT TMP

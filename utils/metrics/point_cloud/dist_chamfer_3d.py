@@ -1,5 +1,4 @@
-# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
-# All rights reserved.
+"""Stripped from https://github.com/alexzhou907/PVD/blob/main/metrics/ChamferDistancePytorch/chamfer3D/dist_chamfer_3D.py"""
 
 from torch import nn
 from torch.autograd import Function

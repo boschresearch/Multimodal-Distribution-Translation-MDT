@@ -1,5 +1,4 @@
-# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
-# All rights reserved.
+"""Stripped from https://github.com/abraham-ai/stable-diffusion/blob/main/ldm/models/autoencoder.py"""
 
 import torch
 

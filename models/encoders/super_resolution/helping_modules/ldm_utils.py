@@ -1,5 +1,4 @@
-# Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
-# All rights reserved.
+"""Stripped from https://github.com/hasan1292/mDDPM/blob/main/src/utils/LDM.py"""
 
 import importlib
 import torch
