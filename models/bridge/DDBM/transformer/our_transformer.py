@@ -75,58 +75,106 @@ class PatchEmbedding(nn.Module):
         return x
 
 
-#################################################################################
-#                   Sine/Cosine Positional Embedding Functions                  #
-#################################################################################
-# https://github.com/facebookresearch/mae/blob/main/util/pos_embed.py
-
 def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False, extra_tokens=0):
     """
-    grid_size: int of the grid height and width
-    return:
-    pos_embed: [grid_size*grid_size, embed_dim] or [1+grid_size*grid_size, embed_dim] (w/ or w/o cls_token)
+    Create 2D sinusoidal positional embeddings.
+    
+    Args:
+        embed_dim: embedding dimension
+        grid_size: size of spatial grid (height and width)
+        cls_token: whether to include class token
+        extra_tokens: number of extra tokens to prepend
+    
+    Returns:
+        pos_embed: positional embeddings of shape [grid_size*grid_size, embed_dim]
+                   or [extra_tokens+grid_size*grid_size, embed_dim] if extra_tokens > 0
     """
-    grid_h = np.arange(grid_size, dtype=np.float32)
-    grid_w = np.arange(grid_size, dtype=np.float32)
-    grid = np.meshgrid(grid_w, grid_h)  # here w goes first
-    grid = np.stack(grid, axis=0)
-
-    grid = grid.reshape([2, 1, grid_size, grid_size])
-    pos_embed = get_2d_sincos_pos_embed_from_grid(embed_dim, grid)
+    # Create coordinate grids
+    y_coords = np.arange(grid_size, dtype=np.float32)
+    x_coords = np.arange(grid_size, dtype=np.float32)
+    
+    # Create meshgrid with y (height) and x (width)
+    yy, xx = np.meshgrid(y_coords, x_coords, indexing='ij')
+    
+    # Flatten the grids
+    yy_flat = yy.flatten()
+    xx_flat = xx.flatten()
+    
+    # Generate embeddings for each dimension
+    half_dim = embed_dim // 2
+    emb_y = get_1d_sincos_pos_embed_from_grid(half_dim, yy_flat)
+    emb_x = get_1d_sincos_pos_embed_from_grid(half_dim, xx_flat)
+    
+    # Concatenate embeddings
+    pos_embed = np.concatenate([emb_y, emb_x], axis=1)
+    
+    # Add extra tokens if needed
     if cls_token and extra_tokens > 0:
-        pos_embed = np.concatenate([np.zeros([extra_tokens, embed_dim]), pos_embed], axis=0)
+        extra_embed = np.zeros([extra_tokens, embed_dim], dtype=np.float32)
+        pos_embed = np.concatenate([extra_embed, pos_embed], axis=0)
+    
     return pos_embed
 
 
 def get_2d_sincos_pos_embed_from_grid(embed_dim, grid):
-    assert embed_dim % 2 == 0
-
-    # use half of dimensions to encode grid_h
-    emb_h = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[0])  # (H*W, D/2)
-    emb_w = get_1d_sincos_pos_embed_from_grid(embed_dim // 2, grid[1])  # (H*W, D/2)
-
-    emb = np.concatenate([emb_h, emb_w], axis=1)  # (H*W, D)
-    return emb
+    """
+    Generate 2D sinusoidal positional embeddings from a grid.
+    
+    Args:
+        embed_dim: output dimension (must be even)
+        grid: tuple of (grid_h, grid_w) where each is a flattened array of positions
+    
+    Returns:
+        emb: positional embeddings of shape (H*W, embed_dim)
+    """
+    if embed_dim % 2 != 0:
+        raise ValueError("embed_dim must be even")
+    
+    # Split embedding dimension equally between height and width
+    dim_per_axis = embed_dim // 2
+    
+    # Generate embeddings for height and width separately
+    height_emb = get_1d_sincos_pos_embed_from_grid(dim_per_axis, grid[0])
+    width_emb = get_1d_sincos_pos_embed_from_grid(dim_per_axis, grid[1])
+    
+    # Combine height and width embeddings
+    combined_emb = np.concatenate([height_emb, width_emb], axis=1)
+    
+    return combined_emb
 
 
 def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     """
-    embed_dim: output dimension for each position
-    pos: a list of positions to be encoded: size (M,)
-    out: (M, D)
+    Generate 1D sinusoidal positional embeddings.
+    
+    Args:
+        embed_dim: output dimension for each position (must be even)
+        pos: array of positions to be encoded, shape (M,)
+    
+    Returns:
+        emb: positional embeddings of shape (M, embed_dim)
     """
-    assert embed_dim % 2 == 0
-    omega = np.arange(embed_dim // 2, dtype=np.float64)
-    omega /= embed_dim / 2.
-    omega = 1. / 10000 ** omega  # (D/2,)
-
-    pos = pos.reshape(-1)  # (M,)
-    out = np.einsum('m,d->md', pos, omega)  # (M, D/2), outer product
-
-    emb_sin = np.sin(out)  # (M, D/2)
-    emb_cos = np.cos(out)  # (M, D/2)
-
-    emb = np.concatenate([emb_sin, emb_cos], axis=1)  # (M, D)
+    if embed_dim % 2 != 0:
+        raise ValueError("embed_dim must be even")
+    
+    # Flatten position array
+    pos = pos.flatten()
+    
+    # Create frequency bands
+    half_dim = embed_dim // 2
+    freq_bands = np.arange(half_dim, dtype=np.float32)
+    freq_bands = np.exp(-np.log(10000.0) * freq_bands / half_dim)
+    
+    # Compute angles: pos * freq for each position and frequency
+    angles = pos[:, np.newaxis] * freq_bands[np.newaxis, :]
+    
+    # Apply sine and cosine
+    sin_emb = np.sin(angles)
+    cos_emb = np.cos(angles)
+    
+    # Interleave sine and cosine: [sin, cos, sin, cos, ...]
+    emb = np.concatenate([sin_emb, cos_emb], axis=1)
+    
     return emb
 
 
