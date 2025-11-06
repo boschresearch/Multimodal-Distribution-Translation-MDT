@@ -51,6 +51,9 @@ class ShapeNetDataset(torch.utils.data.Dataset):
         @param view_num: load view_num of images at once
             - >= 1: image size: view * c * h * w
             - -1: image size: c * h * w
+            
+        Stripped down and slightly modified version of ShapeNetDataset from
+        https://github.com/sunethma/P3D-FusionNet-backend
         """
 
         if split not in ['train', 'val', 'test']:
