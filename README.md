@@ -1,6 +1,8 @@
 # Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
 This repository contains the code for the paper - Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge
 
