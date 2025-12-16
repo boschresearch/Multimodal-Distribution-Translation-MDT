@@ -3,16 +3,13 @@
 
 """Based on: https://github.com/crowsonkb/k-diffusion"""
 
-from functools import partial
 
 import numpy as np
-import torch
 import torch as th
-import torch.nn.functional as F
 
 from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import (vp_logs,
                                                                 vp_logsnr)
-from lddbm.utils.nn import append_dims, append_zero, mean_flat
+from lddbm.utils.nn import append_dims, append_zero
 
 
 class KarrasDenoiser:

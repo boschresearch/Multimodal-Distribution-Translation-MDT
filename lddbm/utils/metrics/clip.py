@@ -43,5 +43,3 @@ def calculate_clip_loss(B1, B2, temperature=0.07):
 
     # Return the average of the two losses
     return (loss_B1 + loss_B2) / 2
-
-    return loss

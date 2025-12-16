@@ -1,11 +1,7 @@
 """Stripped from https://github.com/hasan1292/mDDPM/blob/main/src/utils/LDM.py"""
 
 import importlib
-import multiprocessing as mp
-from collections import abc
 from inspect import isfunction
-from queue import Queue
-from threading import Thread
 
 import numpy as np
 import torch
@@ -22,7 +18,7 @@ def default(val, d):
 
 
 def instantiate_from_config(config):
-    if not "target" in config:
+    if "target" not in config:
         if config == "__is_first_stage__":
             return None
         elif config == "__is_unconditional__":

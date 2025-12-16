@@ -239,7 +239,7 @@ def write(voxel_model, fp):
     line = "scale " + str(voxel_model.scale) + "\n"
     fp.write(line.encode("ascii"))
     fp.write("data\n".encode("ascii"))
-    if not voxel_model.axis_order in ("xzy", "xyz"):
+    if voxel_model.axis_order not in ("xzy", "xyz"):
         raise ValueError("Unsupported voxel model axis order")
 
     if voxel_model.axis_order == "xzy":

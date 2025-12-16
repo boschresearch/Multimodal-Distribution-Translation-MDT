@@ -3,7 +3,7 @@
 from inspect import isfunction
 
 import torch
-from einops import rearrange, repeat
+from einops import rearrange
 from torch import nn
 
 

@@ -3,7 +3,6 @@
 import copy
 import glob
 import os
-import sys
 
 import blobfile as bf
 import torch

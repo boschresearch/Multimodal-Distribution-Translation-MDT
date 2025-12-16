@@ -5,10 +5,8 @@ Stripped from https://github.com/aengusng8/Consistency-GAN/blob/main/cm/nn.py
 
 import math
 
-import numpy as np
 import torch as th
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 # PyTorch 1.7 has SiLU, but we support PyTorch 1.5.
