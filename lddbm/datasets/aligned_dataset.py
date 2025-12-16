@@ -3,7 +3,7 @@ import os.path
 from typing import Callable
 import torch
 import numpy as np
-from datasets.shapenet.binvox_rw import read_as_3d_array
+from lddbm.datasets.shapenet.binvox_rw import read_as_3d_array
 from PIL import Image
 
 

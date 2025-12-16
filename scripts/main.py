@@ -7,14 +7,14 @@
 """
 import torch
 
-from models.mm_dist_trans import ModalityTranslationBridge
-from utils.models_loader import create_encoder, create_bridge, create_decoder
-from utils.weights_loading import load_weights
-from utils import logger
-from utils.general_utils import create_workdir
-from configs.config_router import get_configs
-from datasets import load_data
-from trainer.trainer import TrainLoop
+from lddbm.models.mm_dist_trans import ModalityTranslationBridge
+from lddbm.utils.models_loader import create_encoder, create_bridge, create_decoder
+from lddbm.utils.weights_loading import load_weights
+from lddbm.utils import logger
+from lddbm.utils.general_utils import create_workdir
+from lddbm.configs.config_router import get_configs
+from lddbm.datasets import load_data
+from lddbm.trainer.trainer import TrainLoop
 
 
 def main(args):

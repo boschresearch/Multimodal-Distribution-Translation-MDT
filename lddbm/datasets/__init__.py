@@ -3,14 +3,11 @@ from glob import glob
 import torch
 import numpy as np
 import torchvision.transforms as T
-from .aligned_dataset import CelebaDataset
+from lddbm.datasets.aligned_dataset import CelebaDataset
 from PIL import Image
 from sklearn.model_selection import train_test_split
-from torch.utils.data.sampler import Sampler
-from utils.names import Datasets
-from datasets.shapenet.shapes_3d_transforms import Compose, Normalize, RandomBackground, ToTensor, CenterCrop, \
-    RandomCrop, ColorJitter, \
-    RandomNoise, RandomFlip, RandomPermuteRGB
+from lddbm.utils.names import Datasets
+from lddbm.datasets.shapenet.shapes_3d_transforms import Compose, RandomBackground, ToTensor, CenterCrop
 
 
 def load_data(

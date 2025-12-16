@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from models.encoders.super_resolution.helping_modules.attention_modules import LinearAttention
+from lddbm.models.encoders.super_resolution.helping_modules.attention_modules import LinearAttention
 
 
 def get_timestep_embedding(timesteps, embedding_dim):

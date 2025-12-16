@@ -2,9 +2,9 @@
 
 import torch
 
-from models.encoders.super_resolution.helping_modules.ldm_utils import DiagonalGaussianDistribution
-from models.encoders.super_resolution.helping_modules.modules import Upsample, Downsample, Encoder, Decoder
-from utils.names import Encoders
+from lddbm.models.encoders.super_resolution.helping_modules.ldm_utils import DiagonalGaussianDistribution
+from lddbm.models.encoders.super_resolution.helping_modules.modules import Upsample, Downsample, Encoder, Decoder
+from lddbm.utils.names import Encoders
 
 
 class AutoencoderKLInnerExtdEncoder(torch.nn.Module):

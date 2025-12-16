@@ -2,7 +2,7 @@
 # All rights reserved.
 
 """ From 5 views of the object to 3D reconstruction of it"""
-from utils.names import Encoders, Decoders, ReconstructionLoss, TrainingStrategy, BridgeModelsTyps, Datasets, \
+from lddbm.utils.names import Encoders, Decoders, ReconstructionLoss, TrainingStrategy, BridgeModelsTyps, Datasets, \
     DistanceMetric
 
 

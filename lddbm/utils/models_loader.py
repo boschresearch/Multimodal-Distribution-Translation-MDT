@@ -4,17 +4,17 @@
 import os
 
 from omegaconf import OmegaConf
-from models.bridge.DDBM.diffusion.karras_diffusion import KarrasDenoiser
-from models.bridge.DDBM.diffusion.resample import UniformSampler, RealUniformSampler, LossSecondMomentResampler, \
+from lddbm.models.bridge.DDBM.diffusion.karras_diffusion import KarrasDenoiser
+from lddbm.models.bridge.DDBM.diffusion.resample import UniformSampler, RealUniformSampler, LossSecondMomentResampler, \
     LogNormalSampler
-from models.bridge.DDBM.transformer.our_transformer import AutoRegressiveTransformer
-from models.bridge.bridge_model import BridgeModel
-from models.encoders.shapenet.encoder import Conv3DEncoder, MV2DEncoder
-from models.encoders.shapenet.encoder import Identity as EncIdentity
-from models.decoders.shapenet.decoder import Identity as DecIdentity
-from models.decoders.shapenet.decoder import Conv3DDecoder
-from models.encoders.super_resolution.encoder import AutoencoderKLInnerExtdEncoder, AutoencoderKLInnerExtdDecoder
-from utils.names import Encoders, Decoders, BridgeModelsTyps
+from lddbm.models.bridge.DDBM.transformer.our_transformer import AutoRegressiveTransformer
+from lddbm.models.bridge.bridge_model import BridgeModel
+from lddbm.models.encoders.shapenet.encoder import Conv3DEncoder, MV2DEncoder
+from lddbm.models.encoders.shapenet.encoder import Identity as EncIdentity
+from lddbm.models.decoders.shapenet.decoder import Identity as DecIdentity
+from lddbm.models.decoders.shapenet.decoder import Conv3DDecoder
+from lddbm.models.encoders.super_resolution.encoder import AutoencoderKLInnerExtdEncoder, AutoencoderKLInnerExtdDecoder
+from lddbm.utils.names import Encoders, Decoders, BridgeModelsTyps
 
 
 def create_encoder(encoder_type: Encoders, model_args):

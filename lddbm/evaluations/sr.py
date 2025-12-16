@@ -1,8 +1,8 @@
 # Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
 # All rights reserved.
 
-from models.other.lpips import LPIPS
-from utils import dist_util
+from lddbm.models.other.lpips import LPIPS
+# from lddbm.utils import dist_util
 import torchvision.transforms as T
 from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
 from PIL import Image

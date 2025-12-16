@@ -4,9 +4,9 @@
 """Multimodal Distribution Translator"""
 import torch
 
-from models.other.lpips import LPIPS
-from utils.names import ReconstructionLoss, TrainingStrategy, DistanceMetric
-from utils.metrics.clip import calculate_clip_loss
+from lddbm.models.other.lpips import LPIPS
+from lddbm.utils.names import ReconstructionLoss, TrainingStrategy, DistanceMetric
+from lddbm.utils.metrics.clip import calculate_clip_loss
 
 
 class ModalityTranslationBridge(torch.nn.Module):

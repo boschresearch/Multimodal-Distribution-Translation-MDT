@@ -9,8 +9,8 @@ import torch as th
 
 from functools import partial
 
-from models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
-from utils.nn import append_dims, mean_flat, append_zero
+from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
+from lddbm.utils.nn import append_dims, mean_flat, append_zero
 import torch.nn.functional as F
 
 

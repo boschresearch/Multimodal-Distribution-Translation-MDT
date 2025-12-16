@@ -3,7 +3,7 @@
 
 import torch
 from matplotlib import pyplot as plt
-from utils.metrics.shapenet import iou_3d, f_score, compute_1_nna
+from lddbm.utils.metrics.shapenet import iou_3d, f_score, compute_1_nna
 
 
 def voxel_to_point_cloud(voxel_grid, size_pass=1024, subsample_limit=1024):

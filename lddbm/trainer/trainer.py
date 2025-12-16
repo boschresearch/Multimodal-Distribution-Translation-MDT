@@ -9,9 +9,9 @@ import blobfile as bf
 import torch
 import torch as th
 from torch.optim import AdamW
-from utils import logger
-from evaluations.helpers import load_evaluations
-from utils.nn import update_ema
+from lddbm.utils import logger
+from lddbm.evaluations.helpers import load_evaluations
+from lddbm.utils.nn import update_ema
 
 
 class TrainLoop:

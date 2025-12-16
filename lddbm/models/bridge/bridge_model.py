@@ -3,10 +3,10 @@
 
 import torch.nn
 
-from models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
-from models.bridge.DDBM.diffusion.karras_diffusion import KarrasDenoiser, karras_sample
-from models.bridge.DDBM.diffusion.resample import ScheduleSampler
-from utils.nn import append_dims
+from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
+from lddbm.models.bridge.DDBM.diffusion.karras_diffusion import KarrasDenoiser, karras_sample
+from lddbm.models.bridge.DDBM.diffusion.resample import ScheduleSampler
+from lddbm.utils.nn import append_dims
 
 
 class BridgeModel(torch.nn.Module):
