@@ -1,9 +1,10 @@
 """Stripped from https://github.com/abraham-ai/stable-diffusion/blob/main/ldm/modules/attention.py"""
 
 from inspect import isfunction
+
 import torch
-from torch import nn
 from einops import rearrange, repeat
+from torch import nn
 
 
 def exists(val):

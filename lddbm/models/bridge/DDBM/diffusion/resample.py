@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 import torch as th
-from scipy.stats import norm
 import torch.distributed as dist
+from scipy.stats import norm
 
 
 def create_named_schedule_sampler(name, diffusion):

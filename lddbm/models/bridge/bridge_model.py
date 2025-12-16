@@ -3,11 +3,10 @@
 
 import torch.nn
 
-from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
+from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import (vp_logs,
+                                                                vp_logsnr)
 from lddbm.models.bridge.DDBM.diffusion.karras_diffusion import (
-    KarrasDenoiser,
-    karras_sample,
-)
+    KarrasDenoiser, karras_sample)
 from lddbm.models.bridge.DDBM.diffusion.resample import ScheduleSampler
 from lddbm.utils.nn import append_dims
 

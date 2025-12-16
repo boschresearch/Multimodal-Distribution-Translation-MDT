@@ -1,7 +1,7 @@
 """Stripped from https://github.com/JRyanShue/NFD/blob/main/nfd/neural_field_diffusion/metrics/PyTorchEMD/emd.py"""
 
-import torch
 import emd_cuda
+import torch
 
 
 class EarthMoverDistanceFunction(torch.autograd.Function):

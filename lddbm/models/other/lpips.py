@@ -3,12 +3,14 @@
 
 """Stripped version of https://github.com/richzhang/PerceptualSimilarity/tree/master/models"""
 
+import hashlib
+import os
+from collections import namedtuple
+
+import requests
 import torch
 import torch.nn as nn
 from torchvision import models
-from collections import namedtuple
-import os, hashlib
-import requests
 from tqdm import tqdm
 
 URL_MAP = {"vgg_lpips": "https://heibox.uni-heidelberg.de/f/607503859c864bc1b30b/?dl=1"}

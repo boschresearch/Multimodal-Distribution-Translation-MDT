@@ -5,9 +5,9 @@ Stripped from https://github.com/aengusng8/Consistency-GAN/blob/main/cm/nn.py
 
 import math
 
+import numpy as np
 import torch as th
 import torch.nn as nn
-import numpy as np
 import torch.nn.functional as F
 
 

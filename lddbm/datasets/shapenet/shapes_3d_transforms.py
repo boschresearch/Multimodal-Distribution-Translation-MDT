@@ -4,13 +4,13 @@
 # References:
 # - https://github.com/xiumingzhang/GenRe-ShapeHD
 
-import cv2
+import os
+import random
 
+import cv2
 # import matplotlib.pyplot as plt
 # import matplotlib.patches as patches
 import numpy as np
-import os
-import random
 import torch
 
 

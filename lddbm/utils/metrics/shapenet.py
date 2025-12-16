@@ -2,8 +2,6 @@
 # All rights reserved.
 
 import torch
-
-import torch
 from scipy.spatial import distance_matrix
 
 

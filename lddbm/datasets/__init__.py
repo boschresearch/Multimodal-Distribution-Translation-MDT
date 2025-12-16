@@ -1,18 +1,16 @@
 from glob import glob
 
-import torch
 import numpy as np
+import torch
 import torchvision.transforms as T
-from lddbm.datasets.aligned_dataset import CelebaDataset
 from PIL import Image
 from sklearn.model_selection import train_test_split
+
+from lddbm.datasets.aligned_dataset import CelebaDataset
+from lddbm.datasets.shapenet.shapes_3d_transforms import (CenterCrop, Compose,
+                                                          RandomBackground,
+                                                          ToTensor)
 from lddbm.utils.names import Datasets
-from lddbm.datasets.shapenet.shapes_3d_transforms import (
-    Compose,
-    RandomBackground,
-    ToTensor,
-    CenterCrop,
-)
 
 
 def load_data(

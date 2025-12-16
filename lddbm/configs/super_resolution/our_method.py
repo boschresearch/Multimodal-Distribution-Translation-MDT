@@ -2,15 +2,8 @@
 # All rights reserved.
 
 """ From 5 views of the object to 3D reconstruction of it"""
-from utils.names import (
-    Encoders,
-    Decoders,
-    ReconstructionLoss,
-    TrainingStrategy,
-    BridgeModelsTyps,
-    Datasets,
-    DistanceMetric,
-)
+from utils.names import (BridgeModelsTyps, Datasets, Decoders, DistanceMetric,
+                         Encoders, ReconstructionLoss, TrainingStrategy)
 
 
 def load_arguments(parser) -> None:

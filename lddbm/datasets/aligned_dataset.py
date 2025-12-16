@@ -1,10 +1,12 @@
 import json
 import os.path
 from typing import Callable
-import torch
+
 import numpy as np
-from lddbm.datasets.shapenet.binvox_rw import read_as_3d_array
+import torch
 from PIL import Image
+
+from lddbm.datasets.shapenet.binvox_rw import read_as_3d_array
 
 
 class CelebaDataset(torch.utils.data.Dataset):

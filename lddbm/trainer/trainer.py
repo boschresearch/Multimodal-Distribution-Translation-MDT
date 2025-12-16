@@ -1,16 +1,17 @@
 """Stripped from https://github.com/wsgharvey/video-diffusion/blob/main/improved_diffusion/train_util.py"""
 
 import copy
+import glob
 import os
 import sys
-import glob
 
 import blobfile as bf
 import torch
 import torch as th
 from torch.optim import AdamW
-from lddbm.utils import logger
+
 from lddbm.evaluations.helpers import load_evaluations
+from lddbm.utils import logger
 from lddbm.utils.nn import update_ema
 
 

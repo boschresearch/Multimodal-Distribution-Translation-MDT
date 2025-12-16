@@ -1,13 +1,14 @@
 # Copyright (c) 2025 Copyright holder of the paper "Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge" submitted to NeurIPS 2025 for review.
 # All rights reserved.
 
+import math
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-import math
-from timm.models.vision_transformer import Mlp
 from einops import rearrange
+from timm.models.vision_transformer import Mlp
 
 
 def modulate(x, shift, scale):

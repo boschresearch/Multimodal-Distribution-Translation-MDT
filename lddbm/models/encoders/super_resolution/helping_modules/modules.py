@@ -1,13 +1,13 @@
 """Stripped from https://github.com/abraham-ai/stable-diffusion/blob/main/ldm/modules/diffusionmodules/model.py"""
 
 import math
+
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
 
-from lddbm.models.encoders.super_resolution.helping_modules.attention_modules import (
-    LinearAttention,
-)
+from lddbm.models.encoders.super_resolution.helping_modules.attention_modules import \
+    LinearAttention
 
 
 def get_timestep_embedding(timesteps, embedding_dim):

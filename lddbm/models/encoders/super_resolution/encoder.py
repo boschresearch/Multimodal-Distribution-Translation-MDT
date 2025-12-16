@@ -2,15 +2,10 @@
 
 import torch
 
-from lddbm.models.encoders.super_resolution.helping_modules.ldm_utils import (
-    DiagonalGaussianDistribution,
-)
+from lddbm.models.encoders.super_resolution.helping_modules.ldm_utils import \
+    DiagonalGaussianDistribution
 from lddbm.models.encoders.super_resolution.helping_modules.modules import (
-    Upsample,
-    Downsample,
-    Encoder,
-    Decoder,
-)
+    Decoder, Downsample, Encoder, Upsample)
 from lddbm.utils.names import Encoders
 
 

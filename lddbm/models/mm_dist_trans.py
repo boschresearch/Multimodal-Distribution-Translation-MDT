@@ -5,8 +5,9 @@
 import torch
 
 from lddbm.models.other.lpips import LPIPS
-from lddbm.utils.names import ReconstructionLoss, TrainingStrategy, DistanceMetric
 from lddbm.utils.metrics.clip import calculate_clip_loss
+from lddbm.utils.names import (DistanceMetric, ReconstructionLoss,
+                               TrainingStrategy)
 
 
 class ModalityTranslationBridge(torch.nn.Module):
