@@ -2,7 +2,7 @@
 # All rights reserved.
 
 from lddbm.models.other.lpips import LPIPS
-# from lddbm.utils import dist_util
+from lddbm.utils import dist_util
 import torchvision.transforms as T
 from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
 from PIL import Image
