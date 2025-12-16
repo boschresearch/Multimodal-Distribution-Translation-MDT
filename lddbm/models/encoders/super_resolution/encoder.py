@@ -2,23 +2,31 @@
 
 import torch
 
-from lddbm.models.encoders.super_resolution.helping_modules.ldm_utils import DiagonalGaussianDistribution
-from lddbm.models.encoders.super_resolution.helping_modules.modules import Upsample, Downsample, Encoder, Decoder
+from lddbm.models.encoders.super_resolution.helping_modules.ldm_utils import (
+    DiagonalGaussianDistribution,
+)
+from lddbm.models.encoders.super_resolution.helping_modules.modules import (
+    Upsample,
+    Downsample,
+    Encoder,
+    Decoder,
+)
 from lddbm.utils.names import Encoders
 
 
 class AutoencoderKLInnerExtdEncoder(torch.nn.Module):
-    def __init__(self,
-                 ddconfig,
-                 embed_dim,
-                 ckpt_path=None,
-                 ignore_keys=[],
-                 image_key="image",
-                 colorize_nlabels=None,
-                 monitor=None,
-                 freeze=False,
-                 model_type='kl_vae_sr128'
-                 ):
+    def __init__(
+        self,
+        ddconfig,
+        embed_dim,
+        ckpt_path=None,
+        ignore_keys=[],
+        image_key="image",
+        colorize_nlabels=None,
+        monitor=None,
+        freeze=False,
+        model_type="kl_vae_sr128",
+    ):
         super().__init__()
         self.image_key = image_key
         self.encoder = Encoder(**ddconfig)
@@ -42,23 +50,30 @@ class AutoencoderKLInnerExtdEncoder(torch.nn.Module):
 
         if model_type == Encoders.KlVaePreTrainedEncoder16.value:
             ch_dim = 32
-            self.conv_in = torch.nn.Conv2d(3, ch_dim, kernel_size=3, stride=1, padding=1)
+            self.conv_in = torch.nn.Conv2d(
+                3, ch_dim, kernel_size=3, stride=1, padding=1
+            )
             self.l1_in = Upsample(in_channels=ch_dim, with_conv=True)
             self.l2_in = Upsample(in_channels=ch_dim, with_conv=True)
             self.l3_in = Upsample(in_channels=ch_dim, with_conv=True)
             self.l4_in = Upsample(in_channels=ch_dim, with_conv=True)
             self.l5_in = torch.nn.Conv2d(ch_dim, 3, kernel_size=3, stride=1, padding=1)
 
-            self.bridging_layer_in = torch.nn.Sequential(self.conv_in, self.l1_in, self.l2_in, self.l3_in,
-                                                         self.l4_in, self.l5_in)
+            self.bridging_layer_in = torch.nn.Sequential(
+                self.conv_in, self.l1_in, self.l2_in, self.l3_in, self.l4_in, self.l5_in
+            )
 
         elif model_type == Encoders.KlVaePreTrainedEncoder128.value:
             ch_dim = 32
-            self.conv_in = torch.nn.Conv2d(3, ch_dim, kernel_size=3, stride=1, padding=1)
+            self.conv_in = torch.nn.Conv2d(
+                3, ch_dim, kernel_size=3, stride=1, padding=1
+            )
             self.l1_in = Upsample(in_channels=ch_dim, with_conv=True)
             self.l2_in = torch.nn.Conv2d(ch_dim, 3, kernel_size=3, stride=1, padding=1)
 
-            self.bridging_layer_in = torch.nn.Sequential(self.conv_in, self.l1_in, self.l2_in)
+            self.bridging_layer_in = torch.nn.Sequential(
+                self.conv_in, self.l1_in, self.l2_in
+            )
         else:
             raise NotImplementedError("No Such model type")
 
@@ -92,27 +107,32 @@ class AutoencoderKLInnerExtdEncoder(torch.nn.Module):
 
     def configure_optimizers(self):
         lr = self.learning_rate
-        opt_ae = torch.optim.Adam(list(self.encoder.parameters()) +
-                                  list(self.decoder.parameters()) +
-                                  list(self.quant_conv.parameters()) +
-                                  list(self.post_quant_conv.parameters()),
-                                  lr=lr, betas=(0.5, 0.9))
-        opt_disc = torch.optim.Adam(self.loss.discriminator.parameters(),
-                                    lr=lr, betas=(0.5, 0.9))
+        opt_ae = torch.optim.Adam(
+            list(self.encoder.parameters())
+            + list(self.decoder.parameters())
+            + list(self.quant_conv.parameters())
+            + list(self.post_quant_conv.parameters()),
+            lr=lr,
+            betas=(0.5, 0.9),
+        )
+        opt_disc = torch.optim.Adam(
+            self.loss.discriminator.parameters(), lr=lr, betas=(0.5, 0.9)
+        )
         return [opt_ae, opt_disc], []
 
 
 class AutoencoderKLInnerExtdDecoder(torch.nn.Module):
-    def __init__(self,
-                 ddconfig,
-                 embed_dim,
-                 ckpt_path=None,
-                 ignore_keys=[],
-                 image_key="image",
-                 colorize_nlabels=None,
-                 monitor=None,
-                 freeze=False,
-                 ):
+    def __init__(
+        self,
+        ddconfig,
+        embed_dim,
+        ckpt_path=None,
+        ignore_keys=[],
+        image_key="image",
+        colorize_nlabels=None,
+        monitor=None,
+        freeze=False,
+    ):
         super().__init__()
         self.image_key = image_key
         self.decoder = Decoder(**ddconfig)
@@ -136,7 +156,9 @@ class AutoencoderKLInnerExtdDecoder(torch.nn.Module):
         self.conv_out = torch.nn.Conv2d(3, ch_dim, kernel_size=3, stride=1, padding=1)
         self.l1_out = Downsample(in_channels=ch_dim, with_conv=True)
         self.l2_out = torch.nn.Conv2d(ch_dim, 3, kernel_size=3, stride=1, padding=1)
-        self.bridging_layer_out = torch.nn.Sequential(self.conv_out, self.l1_out, self.l2_out)
+        self.bridging_layer_out = torch.nn.Sequential(
+            self.conv_out, self.l1_out, self.l2_out
+        )
 
     def init_from_ckpt(self, path, ignore_keys=list()):
         sd = torch.load(path, map_location="cpu")["state_dict"]
@@ -167,11 +189,15 @@ class AutoencoderKLInnerExtdDecoder(torch.nn.Module):
 
     def configure_optimizers(self):
         lr = self.learning_rate
-        opt_ae = torch.optim.Adam(list(self.encoder.parameters()) +
-                                  list(self.decoder.parameters()) +
-                                  list(self.quant_conv.parameters()) +
-                                  list(self.post_quant_conv.parameters()),
-                                  lr=lr, betas=(0.5, 0.9))
-        opt_disc = torch.optim.Adam(self.loss.discriminator.parameters(),
-                                    lr=lr, betas=(0.5, 0.9))
+        opt_ae = torch.optim.Adam(
+            list(self.encoder.parameters())
+            + list(self.decoder.parameters())
+            + list(self.quant_conv.parameters())
+            + list(self.post_quant_conv.parameters()),
+            lr=lr,
+            betas=(0.5, 0.9),
+        )
+        opt_disc = torch.optim.Adam(
+            self.loss.discriminator.parameters(), lr=lr, betas=(0.5, 0.9)
+        )
         return [opt_ae, opt_disc], []

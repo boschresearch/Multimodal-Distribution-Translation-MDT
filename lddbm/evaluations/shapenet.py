@@ -24,13 +24,16 @@ def voxel_to_point_cloud(voxel_grid, size_pass=1024, subsample_limit=1024):
     for b in range(B):
         batch_clouds = []
         for c in range(C):
-            indices = torch.nonzero(voxel_grid[b, c], as_tuple=False)  # Extract non-empty voxel locations
+            indices = torch.nonzero(
+                voxel_grid[b, c], as_tuple=False
+            )  # Extract non-empty voxel locations
 
             if indices.shape[0] < size_pass:
                 continue  # Discard if fewer than 1024 points
 
             sampled_indices = indices[
-                torch.randperm(indices.shape[0])[:subsample_limit]]  # Uniformly sample 1024 points
+                torch.randperm(indices.shape[0])[:subsample_limit]
+            ]  # Uniformly sample 1024 points
             batch_clouds.append(sampled_indices)
 
         if batch_clouds:
@@ -52,8 +55,8 @@ def plot_point_cloud(point_cloud, angles=[(30, 30), (60, 30), (90, 0)]):
     fig = plt.figure(figsize=(15, 5))
 
     for i, (elev, azim) in enumerate(angles):
-        ax = fig.add_subplot(1, len(angles), i + 1, projection='3d')
-        ax.scatter(point_cloud[:, 0], point_cloud[:, 1], point_cloud[:, 2], s=1, c='b')
+        ax = fig.add_subplot(1, len(angles), i + 1, projection="3d")
+        ax.scatter(point_cloud[:, 0], point_cloud[:, 1], point_cloud[:, 2], s=1, c="b")
         ax.view_init(elev=elev, azim=azim)
         ax.set_title(f"View: Elev={elev}, Azim={azim}")
 
@@ -74,7 +77,7 @@ class ShapeNetEvaluator:
 
         all_test_data = None
         all_our_data = None
-        if prefix != 'train':
+        if prefix != "train":
             all_test_data = []
             all_our_data = []
 
@@ -127,14 +130,22 @@ class ShapeNetEvaluator:
         total_f_score = total_f_score / (i + 1)
 
         if prefix is None:
-            losses = {'full_IoU': full_IoU, 'full_f_score': total_f_score, 'rec_full_IoU_y': full_IoU_y,
-                      'rec_full_IoU_x': full_IoU_x}
+            losses = {
+                "full_IoU": full_IoU,
+                "full_f_score": total_f_score,
+                "rec_full_IoU_y": full_IoU_y,
+                "rec_full_IoU_x": full_IoU_x,
+            }
             if knn_results is not None:
-                losses.update({'full-1-NNA-CD': knn_results['1-NNA-CD']})
+                losses.update({"full-1-NNA-CD": knn_results["1-NNA-CD"]})
 
         else:
-            losses = {f'{prefix}_full_IoU': full_IoU, f'{prefix}_full_f_score': total_f_score,
-                      f'{prefix}_rec_full_IoU_y': full_IoU_y, f'{prefix}_rec_full_IoU_x': full_IoU_x}
+            losses = {
+                f"{prefix}_full_IoU": full_IoU,
+                f"{prefix}_full_f_score": total_f_score,
+                f"{prefix}_rec_full_IoU_y": full_IoU_y,
+                f"{prefix}_rec_full_IoU_x": full_IoU_x,
+            }
 
         return losses
 
@@ -171,22 +182,48 @@ class ShapeNetEvaluator:
         f_s = f_score(x_hat, x)
 
         if prefix is None:
-            losses = {'IoU': IoU, 'f_score': f_s, 'rec_IoU_y': IoU_y, 'rec_IoU_x': IoU_x, 'y_rec_loss': y_rec_loss}
+            losses = {
+                "IoU": IoU,
+                "f_score": f_s,
+                "rec_IoU_y": IoU_y,
+                "rec_IoU_x": IoU_x,
+                "y_rec_loss": y_rec_loss,
+            }
         else:
-            losses = {f'{prefix}_IoU': IoU, f'{prefix}_f_score': f_s, f'{prefix}_rec_IoU_y': IoU_y,
-                      f'{prefix}_rec_IoU_x': IoU_x, f'{prefix}_y_rec_loss': y_rec_loss}
+            losses = {
+                f"{prefix}_IoU": IoU,
+                f"{prefix}_f_score": f_s,
+                f"{prefix}_rec_IoU_y": IoU_y,
+                f"{prefix}_rec_IoU_x": IoU_x,
+                f"{prefix}_y_rec_loss": y_rec_loss,
+            }
 
         return losses
 
-    def evaluate(self, model, dataloader, eval_type='full', prefix=None, save_dir='', sampling_steps=40):
-        assert eval_type in ['full', 'one_batch'], "Can run evaulation on full dataloader or batch only."
+    def evaluate(
+        self,
+        model,
+        dataloader,
+        eval_type="full",
+        prefix=None,
+        save_dir="",
+        sampling_steps=40,
+    ):
+        assert eval_type in [
+            "full",
+            "one_batch",
+        ], "Can run evaulation on full dataloader or batch only."
         model.eval()
 
-        if eval_type == 'full':
-            metrics_dict = self.run_full_eval(model, dataloader, prefix, save_dir, sampling_steps)
+        if eval_type == "full":
+            metrics_dict = self.run_full_eval(
+                model, dataloader, prefix, save_dir, sampling_steps
+            )
 
         else:
             batch = next(iter(dataloader))
-            metrics_dict = self.run_one_batch_eval(model, batch, prefix, sampling_steps=sampling_steps)
+            metrics_dict = self.run_one_batch_eval(
+                model, batch, prefix, sampling_steps=sampling_steps
+            )
 
         return metrics_dict

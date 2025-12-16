@@ -13,13 +13,14 @@ if not chamfer_found:
 
     from torch.utils.cpp_extension import load
 
-    chamfer_3D = load(name="chamfer_3D",
-                      sources=[
-                          "/".join(os.path.abspath(__file__).split('/')[:-1] + ["chamfer_cuda.cpp"]),
-                          "/".join(os.path.abspath(__file__).split('/')[:-1] + ["chamfer3D.cu"]),
-                      ],
-
-                      extra_cuda_cflags=['--compiler-bindir=/usr/bin/gcc-8'], )
+    chamfer_3D = load(
+        name="chamfer_3D",
+        sources=[
+            "/".join(os.path.abspath(__file__).split("/")[:-1] + ["chamfer_cuda.cpp"]),
+            "/".join(os.path.abspath(__file__).split("/")[:-1] + ["chamfer3D.cu"]),
+        ],
+        extra_cuda_cflags=["--compiler-bindir=/usr/bin/gcc-8"],
+    )
     print("Loaded JIT 3D CUDA chamfer distance")
 
 else:

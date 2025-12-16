@@ -23,32 +23,44 @@ def main(args):
 
     # --- set the gpu configurations --- #
     torch.cuda.set_device(args.gpu_id)
-    device = f'cuda:{torch.cuda.current_device()}'
+    device = f"cuda:{torch.cuda.current_device()}"
 
     # --- set logger --- #
     logger.configure(dir=workdir)
 
     # --- create models --- #
-    logger.log("creating encoder_x model...")  # create the main multimodal diffusion bridge framework
+    logger.log(
+        "creating encoder_x model..."
+    )  # create the main multimodal diffusion bridge framework
     encoder_x = create_encoder(args.encoder_x_type, args)
-    logger.log("creating encoder_y model...")  # create the main multimodal diffusion bridge framework
+    logger.log(
+        "creating encoder_y model..."
+    )  # create the main multimodal diffusion bridge framework
     encoder_y = create_encoder(args.encoder_y_type, args)
-    logger.log("creating decoder_x model...")  # create the main multimodal diffusion bridge framework
+    logger.log(
+        "creating decoder_x model..."
+    )  # create the main multimodal diffusion bridge framework
     decoder_x = create_decoder(args.decoder_x_type, args)
-    logger.log("creating decoder_y model...")  # create the main multimodal diffusion bridge framework
+    logger.log(
+        "creating decoder_y model..."
+    )  # create the main multimodal diffusion bridge framework
     decoder_y = create_decoder(args.decoder_y_type, args)
-    logger.log("creating bridge model...")  # create the main multimodal diffusion bridge framework
+    logger.log(
+        "creating bridge model..."
+    )  # create the main multimodal diffusion bridge framework
     bridge = create_bridge(args)
 
-    mtb = ModalityTranslationBridge(bridge_model=bridge,
-                                    encoder_x=encoder_x,
-                                    encoder_y=encoder_y,
-                                    decoder_x=decoder_x,
-                                    decoder_y=decoder_y,
-                                    rec_loss_type=args.reconstruction_loss_type,
-                                    clip_loss_w=args.clip_loss_w,
-                                    training_strategy=args.training_strategy,
-                                    distance_measure_loss=args.distance_measure_loss)
+    mtb = ModalityTranslationBridge(
+        bridge_model=bridge,
+        encoder_x=encoder_x,
+        encoder_y=encoder_y,
+        decoder_x=decoder_x,
+        decoder_y=decoder_y,
+        rec_loss_type=args.reconstruction_loss_type,
+        clip_loss_w=args.clip_loss_w,
+        training_strategy=args.training_strategy,
+        distance_measure_loss=args.distance_measure_loss,
+    )
     # move to gpu
     mtb.to(device)
 

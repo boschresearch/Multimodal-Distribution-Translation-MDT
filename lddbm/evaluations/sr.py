@@ -4,7 +4,10 @@
 from lddbm.models.other.lpips import LPIPS
 from lddbm.utils import dist_util
 import torchvision.transforms as T
-from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
+from torchmetrics.functional import (
+    peak_signal_noise_ratio,
+    structural_similarity_index_measure,
+)
 from PIL import Image
 
 lpips = LPIPS()
@@ -12,10 +15,12 @@ lpips = LPIPS()
 
 # Function to load and preprocess images
 def load_image(image_path, device):
-    image = Image.open(image_path).convert('RGB')
-    transform = T.Compose([
-        T.ToTensor(),  # Convert image to Tensor (C x H x W)
-    ])
+    image = Image.open(image_path).convert("RGB")
+    transform = T.Compose(
+        [
+            T.ToTensor(),  # Convert image to Tensor (C x H x W)
+        ]
+    )
     image = transform(image).unsqueeze(0)  # Add batch dimension (1 x C x H x W)
     return image.to(device)
 
@@ -74,11 +79,18 @@ class SuperResolutionEvaluator:
         full_lpips_score = total_lpips_score / (i + 1)
 
         if prefix is None:
-            losses = {'full_psnr': full_psnr, 'full_ssim': full_ssim, 'full_lpips_score': full_lpips_score}
+            losses = {
+                "full_psnr": full_psnr,
+                "full_ssim": full_ssim,
+                "full_lpips_score": full_lpips_score,
+            }
 
         else:
-            losses = {f'{prefix}_full_psnr': full_psnr, f'{prefix}_full_ssim': full_ssim,
-                      f'{prefix}_full_lpips_score': full_lpips_score}
+            losses = {
+                f"{prefix}_full_psnr": full_psnr,
+                f"{prefix}_full_ssim": full_ssim,
+                f"{prefix}_full_lpips_score": full_lpips_score,
+            }
 
         return losses
 
@@ -90,18 +102,24 @@ class SuperResolutionEvaluator:
         # calculate super resolution metrics
         psnr, ssim, lpips_score = compute_hr_metrics(x_hat, x)
         if prefix is None:
-            losses = {'psnr': psnr, 'ssim': ssim, 'lpips': lpips_score}
+            losses = {"psnr": psnr, "ssim": ssim, "lpips": lpips_score}
         else:
-            losses = {f'{prefix}_psnr': psnr, f'{prefix}_ssim': ssim,
-                      f'{prefix}_lpips_score': lpips_score}
+            losses = {
+                f"{prefix}_psnr": psnr,
+                f"{prefix}_ssim": ssim,
+                f"{prefix}_lpips_score": lpips_score,
+            }
 
         return losses
 
-    def evaluate(self, model, dataloader, eval_type='full', prefix=None, save_dir=''):
-        assert eval_type in ['full', 'one_batch'], "Can run evaulation on full dataloader or batch only."
+    def evaluate(self, model, dataloader, eval_type="full", prefix=None, save_dir=""):
+        assert eval_type in [
+            "full",
+            "one_batch",
+        ], "Can run evaulation on full dataloader or batch only."
         model.eval()
 
-        if eval_type == 'full':
+        if eval_type == "full":
             metrics_dict = self.run_full_eval(model, dataloader, prefix, save_dir)
 
         else:

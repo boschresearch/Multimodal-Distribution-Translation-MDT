@@ -4,13 +4,21 @@
 import torch.nn
 
 from lddbm.models.bridge.DDBM.diffusion.diffusion_utils import vp_logsnr, vp_logs
-from lddbm.models.bridge.DDBM.diffusion.karras_diffusion import KarrasDenoiser, karras_sample
+from lddbm.models.bridge.DDBM.diffusion.karras_diffusion import (
+    KarrasDenoiser,
+    karras_sample,
+)
 from lddbm.models.bridge.DDBM.diffusion.resample import ScheduleSampler
 from lddbm.utils.nn import append_dims
 
 
 class BridgeModel(torch.nn.Module):
-    def __init__(self, denoiser: torch.nn.Module, diffusion: KarrasDenoiser, schedule_sampler: ScheduleSampler):
+    def __init__(
+        self,
+        denoiser: torch.nn.Module,
+        diffusion: KarrasDenoiser,
+        schedule_sampler: ScheduleSampler,
+    ):
         super().__init__()
         self.denoiser = denoiser
         self.diffusion = diffusion
@@ -22,12 +30,29 @@ class BridgeModel(torch.nn.Module):
         dims = z_0.ndim
         noise = torch.randn_like(z_0)
 
-        x_t = self.bridge_sample(z_0, z_T, sigmas, noise, dims, self.diffusion.sigma_max, self.diffusion.beta_d,
-                                 self.diffusion.beta_min)
-        _, denoised = self._denoise(x_t, sigmas, z_T, self.diffusion.pred_mode, self.diffusion.sigma_max,
-                                    self.diffusion.beta_d, self.diffusion.beta_min, self.diffusion.c,
-                                    self.diffusion.sigma_data_end, self.diffusion.sigma_data,
-                                    self.diffusion.cov_xy)
+        x_t = self.bridge_sample(
+            z_0,
+            z_T,
+            sigmas,
+            noise,
+            dims,
+            self.diffusion.sigma_max,
+            self.diffusion.beta_d,
+            self.diffusion.beta_min,
+        )
+        _, denoised = self._denoise(
+            x_t,
+            sigmas,
+            z_T,
+            self.diffusion.pred_mode,
+            self.diffusion.sigma_max,
+            self.diffusion.beta_d,
+            self.diffusion.beta_min,
+            self.diffusion.c,
+            self.diffusion.sigma_data_end,
+            self.diffusion.sigma_data,
+            self.diffusion.cov_xy,
+        )
 
         return denoised
 
@@ -48,24 +73,46 @@ class BridgeModel(torch.nn.Module):
 
         return sample
 
-    def _denoise(self, x_t, sigmas, xT, pred_mode, sigma_max, beta_d, beta_min, c, sigma_data_end, sigma_data, cov_xy,
-                 aux_cond=None):
+    def _denoise(
+        self,
+        x_t,
+        sigmas,
+        xT,
+        pred_mode,
+        sigma_max,
+        beta_d,
+        beta_min,
+        c,
+        sigma_data_end,
+        sigma_data,
+        cov_xy,
+        aux_cond=None,
+    ):
         def get_bridge_scalings(sigma):
-            if pred_mode == 've':
-                A = sigma ** 4 / sigma_max ** 4 * sigma_data_end ** 2 + (
-                        1 - sigma ** 2 / sigma_max ** 2) ** 2 * sigma_data ** 2 + 2 * sigma ** 2 / sigma_max ** 2 * (
-                            1 - sigma ** 2 / sigma_max ** 2) * cov_xy + c ** 2 * sigma ** 2 * (
-                            1 - sigma ** 2 / sigma_max ** 2)
+            if pred_mode == "ve":
+                A = (
+                    sigma**4 / sigma_max**4 * sigma_data_end**2
+                    + (1 - sigma**2 / sigma_max**2) ** 2 * sigma_data**2
+                    + 2
+                    * sigma**2
+                    / sigma_max**2
+                    * (1 - sigma**2 / sigma_max**2)
+                    * cov_xy
+                    + c**2 * sigma**2 * (1 - sigma**2 / sigma_max**2)
+                )
                 c_in = 1 / (A) ** 0.5
-                c_skip = ((
-                                  1 - sigma ** 2 / sigma_max ** 2) * sigma_data ** 2 + sigma ** 2 / sigma_max ** 2 * cov_xy) / A
-                c_out = ((sigma / sigma_max) ** 4 * (
-                        sigma_data_end ** 2 * sigma_data ** 2 - cov_xy ** 2) + sigma_data ** 2 * c ** 2 * sigma ** 2 * (
-                                 1 - sigma ** 2 / sigma_max ** 2)) ** 0.5 * c_in
+                c_skip = (
+                    (1 - sigma**2 / sigma_max**2) * sigma_data**2
+                    + sigma**2 / sigma_max**2 * cov_xy
+                ) / A
+                c_out = (
+                    (sigma / sigma_max) ** 4
+                    * (sigma_data_end**2 * sigma_data**2 - cov_xy**2)
+                    + sigma_data**2 * c**2 * sigma**2 * (1 - sigma**2 / sigma_max**2)
+                ) ** 0.5 * c_in
                 return c_skip, c_out, c_in
 
-
-            elif pred_mode == 'vp':
+            elif pred_mode == "vp":
 
                 logsnr_t = vp_logsnr(sigma, beta_d, beta_min)
                 logsnr_T = vp_logsnr(1, beta_d, beta_min)
@@ -76,12 +123,19 @@ class BridgeModel(torch.nn.Module):
                 b_t = -torch.expm1(logsnr_T - logsnr_t) * logs_t.exp()
                 c_t = -torch.expm1(logsnr_T - logsnr_t) * (2 * logs_t - logsnr_t).exp()
 
-                A = a_t ** 2 * sigma_data_end ** 2 + b_t ** 2 * sigma_data ** 2 + 2 * a_t * b_t * cov_xy + c ** 2 * c_t
+                A = (
+                    a_t**2 * sigma_data_end**2
+                    + b_t**2 * sigma_data**2
+                    + 2 * a_t * b_t * cov_xy
+                    + c**2 * c_t
+                )
 
                 c_in = 1 / (A) ** 0.5
-                c_skip = (b_t * sigma_data ** 2 + a_t * cov_xy) / A
-                c_out = (a_t ** 2 * (
-                        sigma_data_end ** 2 * sigma_data ** 2 - cov_xy ** 2) + sigma_data ** 2 * c ** 2 * c_t) ** 0.5 * c_in
+                c_skip = (b_t * sigma_data**2 + a_t * cov_xy) / A
+                c_out = (
+                    a_t**2 * (sigma_data_end**2 * sigma_data**2 - cov_xy**2)
+                    + sigma_data**2 * c**2 * c_t
+                ) ** 0.5 * c_in
                 return c_skip, c_out, c_in
 
         c_skip, c_out, c_in = [
@@ -97,11 +151,11 @@ class BridgeModel(torch.nn.Module):
     def bridge_sample(self, x0, xT, t, noise, dims, sigma_max, beta_d, beta_min):
         t = append_dims(t, dims)
         # std_t = th.sqrt(t)* th.sqrt(1 - t / self.sigma_max)
-        if self.diffusion.pred_mode.startswith('ve'):
-            std_t = t * torch.sqrt(1 - t ** 2 / sigma_max ** 2)
-            mu_t = t ** 2 / sigma_max ** 2 * xT + (1 - t ** 2 / sigma_max ** 2) * x0
-            samples = (mu_t + std_t * noise)
-        elif self.diffusion.pred_mode.startswith('vp'):
+        if self.diffusion.pred_mode.startswith("ve"):
+            std_t = t * torch.sqrt(1 - t**2 / sigma_max**2)
+            mu_t = t**2 / sigma_max**2 * xT + (1 - t**2 / sigma_max**2) * x0
+            samples = mu_t + std_t * noise
+        elif self.diffusion.pred_mode.startswith("vp"):
             logsnr_t = vp_logsnr(t, beta_d, beta_min)
             logsnr_T = vp_logsnr(sigma_max, beta_d, beta_min)
             logs_t = vp_logs(t, beta_d, beta_min)
@@ -109,7 +163,9 @@ class BridgeModel(torch.nn.Module):
 
             a_t = (logsnr_T - logsnr_t + logs_t - logs_T).exp()
             b_t = -torch.expm1(logsnr_T - logsnr_t) * logs_t.exp()
-            std_t = (-torch.expm1(logsnr_T - logsnr_t)).sqrt() * (logs_t - logsnr_t / 2).exp()
+            std_t = (-torch.expm1(logsnr_T - logsnr_t)).sqrt() * (
+                logs_t - logsnr_t / 2
+            ).exp()
 
             samples = a_t * xT + b_t * x0 + std_t * noise
 

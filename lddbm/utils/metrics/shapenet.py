@@ -8,26 +8,27 @@ from scipy.spatial import distance_matrix
 
 
 def chamfer_distance(pc1, pc2):
-    """ Compute Chamfer Distance between two point clouds. """
+    """Compute Chamfer Distance between two point clouds."""
     dist1 = torch.cdist(pc1, pc2)
     diagonal_idx = torch.arange(dist1.shape[-1])
-    dist1[:, diagonal_idx, diagonal_idx] = float('inf')
+    dist1[:, diagonal_idx, diagonal_idx] = float("inf")
     dist1 = dist1.min(dim=1)[0]
 
     dist2 = torch.cdist(pc2, pc1)
     diagonal_idx = torch.arange(dist2.shape[-1])
-    dist2[:, diagonal_idx, diagonal_idx] = float('inf')
+    dist2[:, diagonal_idx, diagonal_idx] = float("inf")
     dist2 = dist2.min(dim=1)[0]
 
     return dist1.mean(dim=1) + dist2.mean(dim=1)
 
 
 def earth_mover_distance(pc1, pc2):
-    """ Compute Earth Mover's Distance (EMD) between two point clouds. """
+    """Compute Earth Mover's Distance (EMD) between two point clouds."""
     pc1_np = pc1.cpu().numpy()
     pc2_np = pc2.cpu().numpy()
     dist_matrix = distance_matrix(pc1_np[0], pc2_np[0])
     from scipy.optimize import linear_sum_assignment
+
     row_ind, col_ind = linear_sum_assignment(dist_matrix)
     return dist_matrix[row_ind, col_ind].mean()
 
@@ -50,7 +51,9 @@ def compute_1_nna(real_pcs, generated_pcs, bs=1024):
 
     results = {}
 
-    for metric_name, metric_func in zip(["CD"], [chamfer_distance, earth_mover_distance]):
+    for metric_name, metric_func in zip(
+        ["CD"], [chamfer_distance, earth_mover_distance]
+    ):
         # Compute pairwise distances
         dist_matrix = torch.zeros((len(all_pcs), len(all_pcs)))
         pairs_i = []
@@ -77,7 +80,7 @@ def compute_1_nna(real_pcs, generated_pcs, bs=1024):
                 dist_matrix[i, j] = dist
 
         # Determine nearest neighbors
-        dist_matrix.fill_diagonal_(float('inf'))
+        dist_matrix.fill_diagonal_(float("inf"))
         nn_indices = dist_matrix.argmin(dim=1)
         nn_labels = labels[nn_indices]
 
@@ -106,12 +109,15 @@ def iou_3d(prediction, target, threshold=0.5):
     if prediction.shape != target.shape:
         print(
             f"warning: the prediction size {prediction.shape} "
-            f"is not equal to the target size {target.shape} in the iou_3d function")
+            f"is not equal to the target size {target.shape} in the iou_3d function"
+        )
         return torch.tensor(0)
 
     # Binarize the prediction using the threshold
     prediction = (prediction >= threshold).float()
-    target = (target >= threshold).float()  # Ground truth is typically binary, so threshold 0.5
+    target = (
+        target >= threshold
+    ).float()  # Ground truth is typically binary, so threshold 0.5
 
     # Compute intersection (logical AND)
     intersection = torch.sum(prediction * target)
@@ -144,11 +150,15 @@ def f_score(pred_points, gt_points, threshold_d=0.001):
     dist_matrix = torch.cdist(pred_points, gt_points)  # Shape (N, M)
 
     # Precision: Fraction of predicted points within distance threshold from ground-truth points
-    min_dist_pred_to_gt, _ = torch.min(dist_matrix, dim=1)  # Min distance for each predicted point to any gt point
+    min_dist_pred_to_gt, _ = torch.min(
+        dist_matrix, dim=1
+    )  # Min distance for each predicted point to any gt point
     precision = (min_dist_pred_to_gt <= threshold_d).float().mean().item()
 
     # Recall: Fraction of ground-truth points within distance threshold from predicted points
-    min_dist_gt_to_pred, _ = torch.min(dist_matrix, dim=0)  # Min distance for each gt point to any predicted point
+    min_dist_gt_to_pred, _ = torch.min(
+        dist_matrix, dim=0
+    )  # Min distance for each gt point to any predicted point
     recall = (min_dist_gt_to_pred <= threshold_d).float().mean().item()
 
     # F1 score (harmonic mean of precision and recall)

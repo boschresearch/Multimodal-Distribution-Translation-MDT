@@ -5,8 +5,8 @@ from enum import Enum
 
 
 class Datasets(Enum):
-    ShapeNet = 'ShapeNet'
-    SR = 'SuperResolution'
+    ShapeNet = "ShapeNet"
+    SR = "SuperResolution"
 
 
 class TrainingStrategy(Enum):
@@ -15,30 +15,30 @@ class TrainingStrategy(Enum):
 
 
 class ReconstructionLoss(Enum):
-    Reconstruction = 'Reconstruction'
-    Predictive = 'Predictive'
+    Reconstruction = "Reconstruction"
+    Predictive = "Predictive"
 
 
 class DistanceMetric(Enum):
-    MSE = 'MSE'
-    LPIPS = 'LPIPS'
+    MSE = "MSE"
+    LPIPS = "LPIPS"
 
 
 class BridgeModelsTyps(Enum):
-    BridgeTransformer = 'BridgeTransformer'
+    BridgeTransformer = "BridgeTransformer"
 
 
 # ----------- models types -------------- #
 class Encoders(Enum):
-    Conv3DEncoder = 'Conv3DEncoder'
-    MV2DEncoder = 'MV2DEncoder'
-    Identity = 'Identity'
-    KlVaePreTrainedEncoder16 = 'KlVaePreTrainedEncoder16'
-    KlVaePreTrainedEncoder128 = 'KlVaePreTrainedEncoder128'
+    Conv3DEncoder = "Conv3DEncoder"
+    MV2DEncoder = "MV2DEncoder"
+    Identity = "Identity"
+    KlVaePreTrainedEncoder16 = "KlVaePreTrainedEncoder16"
+    KlVaePreTrainedEncoder128 = "KlVaePreTrainedEncoder128"
 
 
 class Decoders(Enum):
-    NoDecoder = 'NoDecoder'
-    Conv3DDecoder = 'Conv3DDecoder'
-    KlVaePreTrainedDecoder128 = 'KlVaePreTrainedDecoder128'
-    Identity = 'Identity'
+    NoDecoder = "NoDecoder"
+    Conv3DDecoder = "Conv3DDecoder"
+    KlVaePreTrainedDecoder128 = "KlVaePreTrainedDecoder128"
+    Identity = "Identity"

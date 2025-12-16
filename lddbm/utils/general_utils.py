@@ -8,7 +8,7 @@ import torch
 
 
 def get_gpu(gpu_id):
-    return torch.device(f'cuda:{gpu_id}')
+    return torch.device(f"cuda:{gpu_id}")
 
 
 def get_workdir(output_base_path, exp):
@@ -19,8 +19,8 @@ def get_workdir(output_base_path, exp):
 def create_workdir(args):
     workdir = get_workdir(args.output_base_path, args.config_name + "_" + args.exp_name)
     Path(workdir).mkdir(parents=True, exist_ok=True)
-    with bf.BlobFile(bf.join(workdir, 'args'), "wb") as f:
+    with bf.BlobFile(bf.join(workdir, "args"), "wb") as f:
         torch.save(args, f)
 
-    print(f'workdir: {workdir}')
+    print(f"workdir: {workdir}")
     return workdir

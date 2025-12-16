@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class ViewEncoder3D(nn.Module):
-    """ 3D CNN Encoder to extract volumetric features """
+    """3D CNN Encoder to extract volumetric features"""
 
     def __init__(self, feature_dim=512):
         super(ViewEncoder3D, self).__init__()
@@ -13,13 +13,21 @@ class ViewEncoder3D(nn.Module):
         self.in_channels = nn.Conv3d(3, 224, kernel_size=3, stride=1, padding=1)
 
         self.encoder = nn.Sequential(
-            nn.Conv3d(32, 64, kernel_size=3, stride=2, padding=1),  # (B, 128, 56, 56, 56)
+            nn.Conv3d(
+                32, 64, kernel_size=3, stride=2, padding=1
+            ),  # (B, 128, 56, 56, 56)
             nn.ReLU(),
-            nn.Conv3d(64, 128, kernel_size=3, stride=2, padding=1),  # (B, 128, 56, 56, 56)
+            nn.Conv3d(
+                64, 128, kernel_size=3, stride=2, padding=1
+            ),  # (B, 128, 56, 56, 56)
             nn.ReLU(),
-            nn.Conv3d(128, 256, kernel_size=3, stride=2, padding=1),  # (B, 128, 56, 56, 56)
+            nn.Conv3d(
+                128, 256, kernel_size=3, stride=2, padding=1
+            ),  # (B, 128, 56, 56, 56)
             nn.ReLU(),
-            nn.Conv3d(256, feature_dim, kernel_size=3, stride=2, padding=1),  # (B, 256, 28, 28, 28)
+            nn.Conv3d(
+                256, feature_dim, kernel_size=3, stride=2, padding=1
+            ),  # (B, 256, 28, 28, 28)
             nn.ReLU(),
         )
 
@@ -30,21 +38,31 @@ class ViewEncoder3D(nn.Module):
 
 
 class ShapeDecoder3D(nn.Module):
-    """ 3D CNN Decoder to generate 3D voxel grid """
+    """3D CNN Decoder to generate 3D voxel grid"""
 
     def __init__(self, feature_dim=512, output_shape=(32, 32, 32)):
         super(ShapeDecoder3D, self).__init__()
         self.decoder = nn.Sequential(
-            nn.ConvTranspose3d(feature_dim, 256, kernel_size=4, stride=2, padding=1),  # (B, 256, 28, 28, 28)
+            nn.ConvTranspose3d(
+                feature_dim, 256, kernel_size=4, stride=2, padding=1
+            ),  # (B, 256, 28, 28, 28)
             nn.ReLU(),
-            nn.ConvTranspose3d(256, 128, kernel_size=4, stride=2, padding=1),  # (B, 128, 56, 56, 56)
+            nn.ConvTranspose3d(
+                256, 128, kernel_size=4, stride=2, padding=1
+            ),  # (B, 128, 56, 56, 56)
             nn.ReLU(),
-            nn.ConvTranspose3d(128, 64, kernel_size=4, stride=2, padding=1),  # (B, 64, 112, 112, 112)
+            nn.ConvTranspose3d(
+                128, 64, kernel_size=4, stride=2, padding=1
+            ),  # (B, 64, 112, 112, 112)
             nn.ReLU(),
-            nn.ConvTranspose3d(64, 1, kernel_size=4, stride=2, padding=1),  # (B, 1, 224, 224, 224)
+            nn.ConvTranspose3d(
+                64, 1, kernel_size=4, stride=2, padding=1
+            ),  # (B, 1, 224, 224, 224)
             nn.Sigmoid(),
         )
-        self.final_conv = nn.Conv3d(1, 1, kernel_size=3, stride=7, padding=1)  # Downsample to (B, 1, 32, 32, 32)
+        self.final_conv = nn.Conv3d(
+            1, 1, kernel_size=3, stride=7, padding=1
+        )  # Downsample to (B, 1, 32, 32, 32)
 
     def forward(self, x):
         x = self.decoder(x)  # (B, 1, 224, 224, 224)
@@ -53,7 +71,7 @@ class ShapeDecoder3D(nn.Module):
 
 
 class MultiViewTo3D(nn.Module):
-    """ Full pipeline: 3D CNN Encoder -> 3D Shape Reconstruction """
+    """Full pipeline: 3D CNN Encoder -> 3D Shape Reconstruction"""
 
     def __init__(self, feature_dim=512, output_shape=(32, 32, 32)):
         super(MultiViewTo3D, self).__init__()

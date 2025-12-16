@@ -18,6 +18,7 @@ def modulate(x, shift, scale):
 #               Embedding Layers for Timesteps and Patches               #
 #################################################################################
 
+
 class TimestepEmbedder(nn.Module):
     """
     Embeds scalar timesteps into vector representations.
@@ -45,12 +46,16 @@ class TimestepEmbedder(nn.Module):
         # https://github.com/openai/glide-text2im/blob/main/glide_text2im/nn.py
         half = dim // 2
         freqs = torch.exp(
-            -math.log(max_period) * torch.arange(start=0, end=half, dtype=torch.float32) / half
+            -math.log(max_period)
+            * torch.arange(start=0, end=half, dtype=torch.float32)
+            / half
         ).to(device=t.device)
         args = t[:, None].float() * freqs[None]
         embedding = torch.cat([torch.cos(args), torch.sin(args)], dim=-1)
         if dim % 2:
-            embedding = torch.cat([embedding, torch.zeros_like(embedding[:, :1])], dim=-1)
+            embedding = torch.cat(
+                [embedding, torch.zeros_like(embedding[:, :1])], dim=-1
+            )
         return embedding
 
     def forward(self, t):
@@ -60,12 +65,14 @@ class TimestepEmbedder(nn.Module):
 
 
 class PatchEmbedding(nn.Module):
-    """ Patchify image and create embeddings """
+    """Patchify image and create embeddings"""
 
     def __init__(self, in_channels, patch_size, embed_dim):
         super().__init__()
         self.patch_size = patch_size
-        self.proj = nn.Conv2d(in_channels, embed_dim, kernel_size=patch_size, stride=patch_size)
+        self.proj = nn.Conv2d(
+            in_channels, embed_dim, kernel_size=patch_size, stride=patch_size
+        )
 
     def forward(self, x):
         # x: (B, C, H, W) -> Patch embeddings (B, N, D)
@@ -78,13 +85,13 @@ class PatchEmbedding(nn.Module):
 def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False, extra_tokens=0):
     """
     Create 2D sinusoidal positional embeddings.
-    
+
     Args:
         embed_dim: embedding dimension
         grid_size: size of spatial grid (height and width)
         cls_token: whether to include class token
         extra_tokens: number of extra tokens to prepend
-    
+
     Returns:
         pos_embed: positional embeddings of shape [grid_size*grid_size, embed_dim]
                    or [extra_tokens+grid_size*grid_size, embed_dim] if extra_tokens > 0
@@ -92,102 +99,109 @@ def get_2d_sincos_pos_embed(embed_dim, grid_size, cls_token=False, extra_tokens=
     # Create coordinate grids
     y_coords = np.arange(grid_size, dtype=np.float32)
     x_coords = np.arange(grid_size, dtype=np.float32)
-    
+
     # Create meshgrid with y (height) and x (width)
-    yy, xx = np.meshgrid(y_coords, x_coords, indexing='ij')
-    
+    yy, xx = np.meshgrid(y_coords, x_coords, indexing="ij")
+
     # Flatten the grids
     yy_flat = yy.flatten()
     xx_flat = xx.flatten()
-    
+
     # Generate embeddings for each dimension
     half_dim = embed_dim // 2
     emb_y = get_1d_sincos_pos_embed_from_grid(half_dim, yy_flat)
     emb_x = get_1d_sincos_pos_embed_from_grid(half_dim, xx_flat)
-    
+
     # Concatenate embeddings
     pos_embed = np.concatenate([emb_y, emb_x], axis=1)
-    
+
     # Add extra tokens if needed
     if cls_token and extra_tokens > 0:
         extra_embed = np.zeros([extra_tokens, embed_dim], dtype=np.float32)
         pos_embed = np.concatenate([extra_embed, pos_embed], axis=0)
-    
+
     return pos_embed
 
 
 def get_2d_sincos_pos_embed_from_grid(embed_dim, grid):
     """
     Generate 2D sinusoidal positional embeddings from a grid.
-    
+
     Args:
         embed_dim: output dimension (must be even)
         grid: tuple of (grid_h, grid_w) where each is a flattened array of positions
-    
+
     Returns:
         emb: positional embeddings of shape (H*W, embed_dim)
     """
     if embed_dim % 2 != 0:
         raise ValueError("embed_dim must be even")
-    
+
     # Split embedding dimension equally between height and width
     dim_per_axis = embed_dim // 2
-    
+
     # Generate embeddings for height and width separately
     height_emb = get_1d_sincos_pos_embed_from_grid(dim_per_axis, grid[0])
     width_emb = get_1d_sincos_pos_embed_from_grid(dim_per_axis, grid[1])
-    
+
     # Combine height and width embeddings
     combined_emb = np.concatenate([height_emb, width_emb], axis=1)
-    
+
     return combined_emb
 
 
 def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     """
     Generate 1D sinusoidal positional embeddings.
-    
+
     Args:
         embed_dim: output dimension for each position (must be even)
         pos: array of positions to be encoded, shape (M,)
-    
+
     Returns:
         emb: positional embeddings of shape (M, embed_dim)
     """
     if embed_dim % 2 != 0:
         raise ValueError("embed_dim must be even")
-    
+
     # Flatten position array
     pos = pos.flatten()
-    
+
     # Create frequency bands
     half_dim = embed_dim // 2
     freq_bands = np.arange(half_dim, dtype=np.float32)
     freq_bands = np.exp(-np.log(10000.0) * freq_bands / half_dim)
-    
+
     # Compute angles: pos * freq for each position and frequency
     angles = pos[:, np.newaxis] * freq_bands[np.newaxis, :]
-    
+
     # Apply sine and cosine
     sin_emb = np.sin(angles)
     cos_emb = np.cos(angles)
-    
+
     # Interleave sine and cosine: [sin, cos, sin, cos, ...]
     emb = np.concatenate([sin_emb, cos_emb], axis=1)
-    
+
     return emb
 
 
 class TransformerEncoder(nn.Module):
-    """ Transformer Encoder with timestep embedding """
+    """Transformer Encoder with timestep embedding"""
 
     def __init__(self, embed_dim, num_heads, depth):
         super().__init__()
-        self.layers = nn.ModuleList([
-            nn.TransformerEncoderLayer(embed_dim, num_heads, dim_feedforward=embed_dim * 4, batch_first=True,
-                                       norm_first=True)
-            for _ in range(depth)
-        ])
+        self.layers = nn.ModuleList(
+            [
+                nn.TransformerEncoderLayer(
+                    embed_dim,
+                    num_heads,
+                    dim_feedforward=embed_dim * 4,
+                    batch_first=True,
+                    norm_first=True,
+                )
+                for _ in range(depth)
+            ]
+        )
 
     def forward(self, x):
         # x: (B, N, D), t_emb: (B, D)
@@ -233,20 +247,18 @@ class Attention(nn.Module):
 
 
 class TransformerDecoderBlock(nn.Module):
-    """ Transformer Decoder with timestep embedding """
+    """Transformer Decoder with timestep embedding"""
 
     def __init__(self, embed_dim, num_heads, ca_mod):
         super().__init__()
         self.ca_mod = ca_mod
         if ca_mod:
             self.adaLN_modulation = nn.Sequential(
-                nn.SiLU(),
-                nn.Linear(embed_dim, 9 * embed_dim, bias=True)
+                nn.SiLU(), nn.Linear(embed_dim, 9 * embed_dim, bias=True)
             )
         else:
             self.adaLN_modulation = nn.Sequential(
-                nn.SiLU(),
-                nn.Linear(embed_dim, 6 * embed_dim, bias=True)
+                nn.SiLU(), nn.Linear(embed_dim, 6 * embed_dim, bias=True)
             )
 
         # Self Attention
@@ -262,16 +274,31 @@ class TransformerDecoderBlock(nn.Module):
         self.norm4 = nn.LayerNorm(embed_dim, elementwise_affine=False, eps=1e-6)
         mlp_hidden_dim = 4 * embed_dim
         approx_gelu = lambda: nn.GELU(approximate="tanh")
-        self.mlp = Mlp(in_features=embed_dim, hidden_features=mlp_hidden_dim, act_layer=approx_gelu, drop=0)
+        self.mlp = Mlp(
+            in_features=embed_dim,
+            hidden_features=mlp_hidden_dim,
+            act_layer=approx_gelu,
+            drop=0,
+        )
 
     def forward(self, x, memory, t_emb):  # t_emb should be
 
         if self.ca_mod:
-            shift_msa, scale_msa, gate_msa, shift_mca, scale_mca, gate_mca, shift_mlp, scale_mlp, gate_mlp = self.adaLN_modulation(
-                t_emb).chunk(9, dim=1)
+            (
+                shift_msa,
+                scale_msa,
+                gate_msa,
+                shift_mca,
+                scale_mca,
+                gate_mca,
+                shift_mlp,
+                scale_mlp,
+                gate_mlp,
+            ) = self.adaLN_modulation(t_emb).chunk(9, dim=1)
         else:
-            shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = self.adaLN_modulation(t_emb).chunk(6,
-                                                                                                                dim=1)
+            shift_msa, scale_msa, gate_msa, shift_mlp, scale_mlp, gate_mlp = (
+                self.adaLN_modulation(t_emb).chunk(6, dim=1)
+            )
 
         # Compute Self-Attention
         x_attn = modulate(self.norm1(x), shift_msa, scale_msa)  # B, 2N, E
@@ -301,7 +328,8 @@ class TransformerDecoder(nn.Module):
         super().__init__()
         self.layers = nn.ModuleList(
             [
-                TransformerDecoderBlock(embed_dim, num_heads, ca_mod) for _ in range(depth)
+                TransformerDecoderBlock(embed_dim, num_heads, ca_mod)
+                for _ in range(depth)
             ]
         )
 
@@ -319,10 +347,11 @@ class FinalLayer(nn.Module):
     def __init__(self, hidden_size, patch_size, out_channels):
         super().__init__()
         self.norm_final = nn.LayerNorm(hidden_size, elementwise_affine=False, eps=1e-6)
-        self.linear = nn.Linear(hidden_size, patch_size * patch_size * out_channels, bias=True)
+        self.linear = nn.Linear(
+            hidden_size, patch_size * patch_size * out_channels, bias=True
+        )
         self.adaLN_modulation = nn.Sequential(
-            nn.SiLU(),
-            nn.Linear(hidden_size, 2 * hidden_size, bias=True)
+            nn.SiLU(), nn.Linear(hidden_size, 2 * hidden_size, bias=True)
         )
 
     def forward(self, x, c):
@@ -334,7 +363,16 @@ class FinalLayer(nn.Module):
 
 class AutoRegressiveTransformer(nn.Module):
 
-    def __init__(self, in_channels=160, img_size=8, patch_size=1, embed_dim=256, num_heads=8, depth=6, ca_mod=False):
+    def __init__(
+        self,
+        in_channels=160,
+        img_size=8,
+        patch_size=1,
+        embed_dim=256,
+        num_heads=8,
+        depth=6,
+        ca_mod=False,
+    ):
         super().__init__()
         self.patch_size = patch_size
         self.num_patches = (img_size // patch_size) ** 2
@@ -344,8 +382,12 @@ class AutoRegressiveTransformer(nn.Module):
         self.x_embedder = PatchEmbedding(in_channels, patch_size, embed_dim)
         self.t_embedder = TimestepEmbedder(embed_dim)
 
-        self.pos_embed = nn.Parameter(torch.zeros(1, self.num_patches, embed_dim), requires_grad=False)
-        pos_embed = get_2d_sincos_pos_embed(self.pos_embed.shape[-1], int(self.num_patches ** 0.5))
+        self.pos_embed = nn.Parameter(
+            torch.zeros(1, self.num_patches, embed_dim), requires_grad=False
+        )
+        pos_embed = get_2d_sincos_pos_embed(
+            self.pos_embed.shape[-1], int(self.num_patches**0.5)
+        )
         self.pos_embed.data.copy_(torch.from_numpy(pos_embed).float().unsqueeze(0))
 
         mask_token = torch.randn(1, 1, embed_dim)
@@ -367,13 +409,15 @@ class AutoRegressiveTransformer(nn.Module):
         assert h * w == x.shape[1]
 
         x = x.reshape(shape=(x.shape[0], h, w, p, p, c))
-        x = torch.einsum('nhwpqc->nchpwq', x)
+        x = torch.einsum("nhwpqc->nchpwq", x)
         imgs = x.reshape(shape=(x.shape[0], c, h * p, h * p))
         return imgs
 
     def forward(self, xt, t, xT):
         B, C, H, W = xt.shape
-        assert H % self.patch_size == 0 and W % self.patch_size == 0, "Image must be divisible by patch size."
+        assert (
+            H % self.patch_size == 0 and W % self.patch_size == 0
+        ), "Image must be divisible by patch size."
 
         # Patch embeddings
         xT_tokens = self.x_embedder(xT) + self.pos_embed  # (B, N, D)

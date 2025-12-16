@@ -10,16 +10,18 @@ from lddbm.utils.metrics.clip import calculate_clip_loss
 
 
 class ModalityTranslationBridge(torch.nn.Module):
-    def __init__(self,
-                 bridge_model,
-                 encoder_x,
-                 encoder_y,
-                 decoder_x,
-                 rec_loss_type,
-                 clip_loss_w,
-                 training_strategy,
-                 distance_measure_loss,
-                 decoder_y=None):
+    def __init__(
+        self,
+        bridge_model,
+        encoder_x,
+        encoder_y,
+        decoder_x,
+        rec_loss_type,
+        clip_loss_w,
+        training_strategy,
+        distance_measure_loss,
+        decoder_y=None,
+    ):
         super().__init__()
         self.bridge_model = bridge_model
         self.encoder_x = encoder_x
@@ -41,8 +43,15 @@ class ModalityTranslationBridge(torch.nn.Module):
         x_bridge_hat = self.decoder_x(z_x_bridge)
         y_hat = self.decoder_y(z_y) if self.decoder_y is not None else None
 
-        return {'z_x': z_x, 'z_y': z_y, 'z_x_bridge': z_x_bridge, 'x_hat': x_hat, 'x_bridge_hat': x_bridge_hat, 'y': y,
-                'y_hat': y_hat}
+        return {
+            "z_x": z_x,
+            "z_y": z_y,
+            "z_x_bridge": z_x_bridge,
+            "x_hat": x_hat,
+            "x_bridge_hat": x_bridge_hat,
+            "y": y,
+            "y_hat": y_hat,
+        }
 
     def sample(self, y: torch.Tensor, sampling_steps=40):
         z_y = self.encoder_y(y)
@@ -54,26 +63,34 @@ class ModalityTranslationBridge(torch.nn.Module):
     def loss(self, loss_comp, step):
 
         # --- bridge loss --- #
-        losses = {'diffusion_loss': ((loss_comp['z_x'] - loss_comp['z_x_bridge']) ** 2).mean()}
+        losses = {
+            "diffusion_loss": ((loss_comp["z_x"] - loss_comp["z_x_bridge"]) ** 2).mean()
+        }
 
         if self.iterative_training_coordinator(step):
             # --- reconstruction loss --- #
             if self.rec_loss_type == ReconstructionLoss.Reconstruction.value:
-                losses['reconstruction_loss'] = self.rec_distance_loss(loss_comp['x_hat'], loss_comp['x'])
+                losses["reconstruction_loss"] = self.rec_distance_loss(
+                    loss_comp["x_hat"], loss_comp["x"]
+                )
 
             elif self.rec_loss_type == ReconstructionLoss.Predictive.value:
-                losses['reconstruction_loss'] = self.rec_distance_loss(loss_comp['x_bridge_hat'], loss_comp['x'])
+                losses["reconstruction_loss"] = self.rec_distance_loss(
+                    loss_comp["x_bridge_hat"], loss_comp["x"]
+                )
 
             # --- clip loss --- #
             if self.clip_loss_w > 0:
-                losses['clip_loss'] = self.clip_loss_w * calculate_clip_loss(loss_comp['z_x'], loss_comp['z_y'])
+                losses["clip_loss"] = self.clip_loss_w * calculate_clip_loss(
+                    loss_comp["z_x"], loss_comp["z_y"]
+                )
 
         # --- final loss --- #
         total_loss = 0
         for v in losses.values():
             total_loss = total_loss + v
 
-        losses['total_loss'] = total_loss
+        losses["total_loss"] = total_loss
 
         return total_loss, losses
 
@@ -83,7 +100,9 @@ class ModalityTranslationBridge(torch.nn.Module):
         elif self.training_strategy == TrainingStrategy.IterativeTraining.value:
             return step % 4 == 0
         else:
-            raise NotImplementedError(f'No such training strategy {self.training_strategy}')
+            raise NotImplementedError(
+                f"No such training strategy {self.training_strategy}"
+            )
 
     def get_loss(self, distance_metric):
         if distance_metric == DistanceMetric.MSE.value:
@@ -92,4 +111,4 @@ class ModalityTranslationBridge(torch.nn.Module):
             self.lpips = LPIPS()
             return lambda x1, x2: self.lpips((x1 + 1) / 2, (x2 + 1) / 2).mean()
         else:
-            raise NotImplementedError(f'No such distance metrics {distance_metric}')
+            raise NotImplementedError(f"No such distance metrics {distance_metric}")

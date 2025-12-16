@@ -16,22 +16,22 @@ from lddbm.utils.nn import update_ema
 
 class TrainLoop:
     def __init__(
-            self,
-            mtb,
-            train_data,
-            test_data,
-            batch_size,
-            lr,
-            ema_rate,
-            log_interval,
-            test_interval,
-            save_interval,
-            lr_anneal_steps,
-            total_training_steps,
-            workdir,
-            dataset,
-            use_scheduler,
-            device,
+        self,
+        mtb,
+        train_data,
+        test_data,
+        batch_size,
+        lr,
+        ema_rate,
+        log_interval,
+        test_interval,
+        save_interval,
+        lr_anneal_steps,
+        total_training_steps,
+        workdir,
+        dataset,
+        use_scheduler,
+        device,
     ):
         self.mtb = mtb
         self.train_data = train_data
@@ -40,9 +40,14 @@ class TrainLoop:
         self.lr = lr
         self.ema_rate = ema_rate
         self.ema_rate = (
-            [self.ema_rate] if isinstance(self.ema_rate, float) else [float(x) for x in self.ema_rate.split(",")]
+            [self.ema_rate]
+            if isinstance(self.ema_rate, float)
+            else [float(x) for x in self.ema_rate.split(",")]
         )
-        self.ema_params = [copy.deepcopy(list(self.mtb.parameters())) for _ in range(len(self.ema_rate))]
+        self.ema_params = [
+            copy.deepcopy(list(self.mtb.parameters()))
+            for _ in range(len(self.ema_rate))
+        ]
         self.log_interval = log_interval
         self.workdir = workdir
         self.test_interval = test_interval
@@ -66,7 +71,9 @@ class TrainLoop:
     def run_loop(self):
         while True:
             for batch, cond, _ in self.train_data:
-                if not (not self.lr_anneal_steps or self.step < self.total_training_steps):
+                if not (
+                    not self.lr_anneal_steps or self.step < self.total_training_steps
+                ):
                     # Save the last checkpoint if it wasn't already saved.
                     if (self.step - 1) % self.save_interval != 0:
                         self.save()
@@ -80,19 +87,31 @@ class TrainLoop:
                 if self.step % self.test_interval == 0:
                     with torch.no_grad():
                         self.run_test_step(batch, cond)
-                        eval_metrics = self.evaluator.evaluate(self.mtb, self.test_data, eval_type='one_batch',
-                                                               save_dir=self.workdir)
+                        eval_metrics = self.evaluator.evaluate(
+                            self.mtb,
+                            self.test_data,
+                            eval_type="one_batch",
+                            save_dir=self.workdir,
+                        )
                         log_score_dict(eval_metrics)
                         self.mtb.train()
                         logger.dumpkvs()
 
                 if self.step % (self.test_interval * 10) == 0:
                     with torch.no_grad():
-                        full_eval_metrics = self.evaluator.evaluate(self.mtb, self.test_data, eval_type='full',
-                                                                    save_dir=self.workdir)
+                        full_eval_metrics = self.evaluator.evaluate(
+                            self.mtb,
+                            self.test_data,
+                            eval_type="full",
+                            save_dir=self.workdir,
+                        )
                         log_score_dict(full_eval_metrics)
-                        full_eval_train = self.evaluator.evaluate(self.mtb, copy.deepcopy(self.train_data),
-                                                                  eval_type='full', prefix='train')
+                        full_eval_train = self.evaluator.evaluate(
+                            self.mtb,
+                            copy.deepcopy(self.train_data),
+                            eval_type="full",
+                            prefix="train",
+                        )
                         log_score_dict(full_eval_train)
                         self.mtb.train()
                         logger.dumpkvs()
@@ -123,15 +142,18 @@ class TrainLoop:
         x = batch.to(self.device)
         y = cond.to(self.device)
         model_outputs = self.mtb(x, y)
-        model_outputs['x'] = x
+        model_outputs["x"] = x
 
-        t, weights = self.mtb.bridge_model.schedule_sampler.sample(x.shape[0], self.device)
+        t, weights = self.mtb.bridge_model.schedule_sampler.sample(
+            x.shape[0], self.device
+        )
         loss, loss_dict = self.mtb.loss(model_outputs, self.step)
 
         loss = (loss * weights).mean()
         log_loss_dict(
-            self.mtb.bridge_model.diffusion, t,
-            {k if train else 'test_' + k: v * weights for k, v in loss_dict.items()}
+            self.mtb.bridge_model.diffusion,
+            t,
+            {k if train else "test_" + k: v * weights for k, v in loss_dict.items()},
         )
         if train:
             loss.backward()
@@ -156,10 +178,12 @@ class TrainLoop:
 
     def save(self, for_preemption=False):
         def maybe_delete_earliest(filename):
-            wc = filename.split(f'{(self.step):06d}')[0] + '*'
+            wc = filename.split(f"{(self.step):06d}")[0] + "*"
             freq_states = list(glob.glob(os.path.join(get_blob_logdir(), wc)))
             if len(freq_states) > 3:
-                earliest = min(freq_states, key=lambda x: x.split('_')[-1].split('.')[0])
+                earliest = min(
+                    freq_states, key=lambda x: x.split("_")[-1].split(".")[0]
+                )
                 os.remove(earliest)
 
         def save_checkpoint(rate, params):
@@ -185,8 +209,8 @@ class TrainLoop:
             maybe_delete_earliest(filename)
 
         with bf.BlobFile(
-                bf.join(get_blob_logdir(), filename),
-                "wb",
+            bf.join(get_blob_logdir(), filename),
+            "wb",
         ) as f:
             th.save(self.opt.state_dict(), f)
 

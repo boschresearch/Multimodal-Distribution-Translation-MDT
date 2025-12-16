@@ -15,7 +15,9 @@ class Conv3DDecoder(torch.nn.Module):
             torch.nn.ConvTranspose3d(128, 64, kernel_size=4, stride=2, padding=1),
             torch.nn.SiLU(True),
         )
-        self.output_layer = torch.nn.ConvTranspose3d(64, num_channels, kernel_size=4, stride=2, padding=1)
+        self.output_layer = torch.nn.ConvTranspose3d(
+            64, num_channels, kernel_size=4, stride=2, padding=1
+        )
         self.non_linear = torch.nn.Sigmoid()
 
     def forward(self, z):

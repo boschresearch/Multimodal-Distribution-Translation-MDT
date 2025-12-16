@@ -12,6 +12,6 @@ def load_evaluations(dataset, device):
     elif dataset == Datasets.SR.value:
         evaluator = SuperResolutionEvaluator()
     else:
-        raise NotImplementedError(f'Evaluator for {dataset} dataset not implemented.')
+        raise NotImplementedError(f"Evaluator for {dataset} dataset not implemented.")
 
     return evaluator
