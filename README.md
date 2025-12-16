@@ -1,6 +1,6 @@
 # Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge
 
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 This repository contains the code for the paper - Towards General Modality Translation with Contrastive and Predictive Latent Diffusion Bridge
 
