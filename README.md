@@ -35,7 +35,7 @@ Follow these steps to set up the environment and run the code:
     
        Unzip the files into the below folder within your project. 
        ```
-       /datasets/shapenet 
+       lddbm/datasets/shapenet 
        ```
     
     #### Zero-shot Super Resolution - Celebs and Flicker.
@@ -46,7 +46,7 @@ Follow these steps to set up the environment and run the code:
     ```
     and place them in the same folder
     ```
-    /datasets/sr 
+    lddbm/datasets/sr 
     ```
     
     The loading of the files happens in the '__init__.py' file of the datasets folder:
@@ -65,11 +65,11 @@ Follow these steps to set up the environment and run the code:
 
     For multi-view to 3D task:
     ```
-    python scripts/main.py --config_name multi2shape --data_path path_of_your_main_diretory/datasets/shapenet "
+    python scripts/main.py --config_name multi2shape --data_path lddbm/datasets/shapenet "
     ```
    For super resolution task:
     ```
-    python scripts/main.py --config_name sr --data_path path_of_your_main_diretory/datasets/sr "
+    python scripts/main.py --config_name sr --data_path lddbm/datasets/sr "
     ```
 
 ## License

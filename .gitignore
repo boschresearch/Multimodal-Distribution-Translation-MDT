@@ -1,3 +1,4 @@
 .vscode/launch.json
 **/*.pyc
 LDDBM.egg-info/
+lddbm/datasets/*.zip
