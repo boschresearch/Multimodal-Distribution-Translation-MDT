@@ -15,11 +15,9 @@ Follow these steps to set up the environment and run the code:
     Open your terminal and create a new Conda environment with Python 3.x:
 
     ```
-    conda create --name your_env_name python=3.8
-    conda activate your_env_name
+    conda create --name lddbm python=3.8
+    conda activate lddbm
     ```
-
-    *(Replace `your_env_name` with your desired environment name).*
 
 2.  **Install Dependencies:**
 
