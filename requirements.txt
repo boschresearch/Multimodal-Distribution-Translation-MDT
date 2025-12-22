@@ -92,7 +92,7 @@ lyft-dataset-sdk==0.0.8
 Markdown==3.5.2
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
-matplotlib==3.5.2
+matplotlib==3.5.3
 matplotlib-inline==0.1.6
 mccabe==0.7.0
 mdurl==0.1.2
