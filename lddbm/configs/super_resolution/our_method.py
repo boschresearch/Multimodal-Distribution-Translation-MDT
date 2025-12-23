@@ -2,13 +2,14 @@
 # All rights reserved.
 
 """ From 5 views of the object to 3D reconstruction of it"""
-from utils.names import (BridgeModelsTyps, Datasets, Decoders, DistanceMetric,
+from lddbm.utils.names import (BridgeModelsTyps, Datasets, Decoders, DistanceMetric,
                          Encoders, ReconstructionLoss, TrainingStrategy)
 
 
 def load_arguments(parser) -> None:
     parser.add_argument("--exp_name", type=str, default="super_resolution")
     parser.add_argument("--task", type=str, default="sr_16_to_128")
+    parser.add_argument("--output_base_path", type=str, default="./")
 
     # --------- shared configurations --------- #
     parser.add_argument("--log_interval", type=int, default=500)

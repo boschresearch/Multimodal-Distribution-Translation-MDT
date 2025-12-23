@@ -26,6 +26,13 @@ Follow these steps to set up the environment and run the code:
     pip install -r requirements.txt
     ```
 
+    **Download pretrained weights for LPIPS evaluation**
+    
+    ```
+    mkdir -p models && cd models
+    wget https://huggingface.co/spaces/multimodalart/vqgan/resolve/dec38285640c45fc3f8377a9726daf6e0de08d6a/taming/modules/autoencoder/lpips/vgg.pth
+    ```
+
 3.  **Download Datasets:**
     #### Multi-view to 3D - ShapeNet
        Download the ShapeNet dataset from the following URL:

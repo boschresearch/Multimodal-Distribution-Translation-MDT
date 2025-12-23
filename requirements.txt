@@ -194,7 +194,7 @@ sniffio==1.3.1
 soundfile==0.12.1
 soupsieve==2.5
 stack-data==0.6.3
-sympy==1.12
+sympy==1.13.1
 tabulate==0.9.0
 tenacity==8.3.0
 termcolor==2.4.0
@@ -206,7 +206,7 @@ tinycss2==1.2.1
 tokenizers==0.19.1
 tomli==2.0.1
 tomlkit==0.12.4
-torch==2.1.0
+torch @ https://download.pytorch.org/whl/cu121/torch-2.1.0%2Bcu121-cp311-cp311-linux_x86_64.whl#sha256=aa984599c2c4ffbc57c48d0d965cbe832e610c967e8179d4ac0a582c733fe112
 torchaudio==2.1.0
 torchdiffeq==0.2.5
 torchmetrics==0.11.4

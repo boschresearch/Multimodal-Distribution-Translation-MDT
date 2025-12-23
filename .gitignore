@@ -2,3 +2,5 @@
 **/*.pyc
 LDDBM.egg-info/
 lddbm/datasets/*.zip
+workdir/*
+**/*.pth*

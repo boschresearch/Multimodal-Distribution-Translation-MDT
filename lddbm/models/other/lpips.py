@@ -68,7 +68,7 @@ class LPIPS(nn.Module):
     def load_from_pretrained(self, name="vgg_lpips"):
         # ckpt = get_ckpt_path(name, "taming/modules/autoencoder/lpips")
         ckpt = torch.load(
-            "/home/ben1tv/DDBM/models/pre_trained/vgg.pth",
+            "models/vgg.pth",
             map_location=torch.device("cpu"),
         )
         self.load_state_dict(ckpt, strict=False)

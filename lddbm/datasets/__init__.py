@@ -103,7 +103,7 @@ def load_data(
         )
 
         image_paths = sorted(
-            [str(p) for p in glob(f"{data_path}/celebsA_HQ/celeba_hq_256" + "/*.jpg")]
+            [str(p) for p in glob(f"{data_path}/celebsA_HQ/**/*.jpg", recursive=True)]
         )
         _, valid_paths = train_test_split(
             image_paths, test_size=5000, shuffle=True, random_state=42

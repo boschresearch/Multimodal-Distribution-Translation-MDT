@@ -7,7 +7,6 @@ from torchmetrics.functional import (peak_signal_noise_ratio,
                                      structural_similarity_index_measure)
 
 from lddbm.models.other.lpips import LPIPS
-from lddbm.utils import dist_util
 
 lpips = LPIPS()
 
@@ -64,8 +63,8 @@ class SuperResolutionEvaluator:
         total_psnr, total_ssim, total_lpips_score = 0, 0, 0
         for i, batch in enumerate(dl):
             x, y, _ = batch
-            x = x.to(dist_util.dev())
-            y = y.to(dist_util.dev())
+            # x = x.to(dist_util.dev())
+            # y = y.to(dist_util.dev())
             x_hat = model.sample(y)
             # calculate super resolution metrics
             psnr, ssim, lpips_score = compute_hr_metrics(x_hat, x)
@@ -95,8 +94,8 @@ class SuperResolutionEvaluator:
 
     def run_one_batch_eval(self, model, batch, prefix):
         x, y, _ = batch
-        x = x.to(dist_util.dev())
-        y = y.to(dist_util.dev())
+        # x = x.to(dist_util.dev())
+        # y = y.to(dist_util.dev())
         x_hat = model.sample(y)
         # calculate super resolution metrics
         psnr, ssim, lpips_score = compute_hr_metrics(x_hat, x)
